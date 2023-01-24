@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="InventoryCount.App.MainPage"
+             Title="Captura de inventario">
+
+    <ContentPage.Content>
+        <StackLayout 
+            Orientation="Vertical"
+            Margin="15,50,15,0">
+            <Frame
+                BackgroundColor="Transparent"
+                HasShadow="True"
+                HorizontalOptions="CenterAndExpand"
+                Padding="0">
+                <Image
+                    Source="main_box.png"
+                    Aspect="AspectFit"
+                    WidthRequest="150"
+                    HeightRequest="150"/>
+            </Frame>
+            <StackLayout
+                Orientation="Vertical"
+                Margin="0,20,0,0">
+                <StackLayout
+                    Orientation="Horizontal"
+                    Margin="30,0,30,0">
+                    <Label 
+                        Text="Ingresa tu area"
+                        TextColor="White"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center">
+                    </Label>
+                    <Entry
+                        x:Name="entArea"
+                        HorizontalOptions="FillAndExpand"
+                        HorizontalTextAlignment="Center"
+                        VerticalOptions="Center"
+                        Text="{Binding Area}"
+                        Keyboard="Numeric">
+                    </Entry>
+                </StackLayout>
+                <Button
+                    Text="Ingresar"
+                    HorizontalOptions="FillAndExpand"
+                    Margin="20,10,20,0"
+                    Command="{Binding ContinueCommand}">
+                </Button>
+            </StackLayout>
+            <Label 
+                Text="Version 1.0" 
+                HorizontalOptions="CenterAndExpand" 
+                VerticalOptions="EndAndExpand" 
+                Margin="0,0,0,10">
+            </Label>
+        </StackLayout>
+    </ContentPage.Content>
+    
+</ContentPage>

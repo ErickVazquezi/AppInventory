@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="InventoryCount.App.Pages.SearchItem"
+             Title="Elementos en tienda"
+             x:Name="ListPage">
+    
+    <ContentPage.Content>
+        <StackLayout>
+
+            <StackLayout>
+                <StackLayout>
+                    <SearchBar x:Name="cvSearchBar"  
+                               TextChanged="cvSearchBar_TextChanged"
+                               BackgroundColor ="White"
+                               Placeholder="Buscar código"/>
+                </StackLayout>
+                <CollectionView
+                    Margin="0,10,0,0"
+                    x:Name="cvStoreItems"
+                    ItemsSource="{Binding StoreItems}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <StackLayout Spacing="0">
+                                <Frame
+                                    BackgroundColor="White"
+                                    Margin="0,0,0,0"
+                                    CornerRadius="0">
+                                    <StackLayout
+                                        Orientation="Vertical">
+                                        <Label
+                                            Text="{Binding Code}"
+                                            FontAttributes="Bold"
+                                            FontSize="14"
+                                            TextColor="Black">
+                                        </Label>
+                                        <Label
+                                            Text="{Binding Name}"
+                                            FontAttributes="Bold"
+                                            FontSize="12"
+                                            TextColor="Black">
+                                        </Label>
+                                    </StackLayout>
+                                    <Frame.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding Path=BindingContext.SelectedItemCommand, Source={x:Reference Name=cvStoreItems}}"
+                                            NumberOfTapsRequired="1"
+                                            CommandParameter="{Binding .}">
+                                        </TapGestureRecognizer>
+                                    </Frame.GestureRecognizers>
+                                </Frame>
+                                <BoxView Color="Black" HeightRequest="1"></BoxView>
+                            </StackLayout>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+                
+            </StackLayout>
+            
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

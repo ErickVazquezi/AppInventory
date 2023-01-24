@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="InventoryCount.App.Pages.ItemCount"
+             Title="{Binding PageTitle}">
+
+    <ContentPage.Content>
+
+        <StackLayout>
+            <StackLayout
+                Orientation="Horizontal"
+                Margin="10,15,10,0">
+                <Entry
+                    Text="{Binding CapturedCode}"
+                    HorizontalOptions="FillAndExpand"
+                    Placeholder="Código"
+                    TextChanged="Entry_TextChanged"
+                    Completed="Entry_Completed"
+                    x:Name="entCode">
+                </Entry>
+                <Button
+                    Text="Buscar"
+                    HorizontalOptions="End"
+                    Command="{Binding GoSearchPageCommand}">
+                </Button>
+            </StackLayout>
+            <!--<Label>
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="Articulos: " FontAttributes="Bold"></Span>
+                        <Span Text="{Binding TotalItemsCount}"></Span>
+                        <Span Text=" Total: " FontAttributes="Bold"></Span>
+                        <Span Text="{Binding TotalInventory}"></Span>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>-->
+            <StackLayout x:Name="Container">
+                <CollectionView
+                    x:Name="cvInventoryCount"
+                    ItemsSource="{Binding InventoryCount}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <StackLayout>
+                                <Frame
+                                    HasShadow="True"
+                                    BackgroundColor="AliceBlue"
+                                    Padding="9">
+                                    <StackLayout Orientation="Horizontal">
+                                        <StackLayout
+                                            Orientation="Vertical">
+                                            <Label
+                                                Text="{Binding Code}"
+                                                FontAttributes="Bold"
+                                                FontSize="14"
+                                                TextColor="Black">
+                                            </Label>
+                                            <Label
+                                                Text="{Binding Name}"
+                                                FontSize="12"
+                                                TextColor="Black">
+                                            </Label>
+                                            <StackLayout.GestureRecognizers>
+                                                <TapGestureRecognizer
+                                                    Command="{Binding Path=BindingContext.EditCountCommand, Source={x:Reference Name=cvInventoryCount}}"
+                                                    NumberOfTapsRequired="1"
+                                                    CommandParameter="{Binding .}">
+                                                </TapGestureRecognizer>
+                                            </StackLayout.GestureRecognizers>
+                                        </StackLayout>
+                                        <StackLayout
+                                            HorizontalOptions="EndAndExpand">
+                                            <Label
+                                                Text="{Binding Count}"
+                                                FontAttributes="Bold"
+                                                FontSize="14"
+                                                TextColor="Black"
+                                                HorizontalOptions="EndAndExpand"
+                                                VerticalOptions="Start">
+                                            </Label>
+                                            <!--<Label
+                                                Text="X"
+                                                FontAttributes="Bold"
+                                                FontSize="14"
+                                                TextColor="DarkRed"
+                                                HorizontalOptions="EndAndExpand"
+                                                VerticalOptions="Start">
+                                            </Label>
+                                            <StackLayout.GestureRecognizers>
+                                                <TapGestureRecognizer
+                                                    Command="{Binding Path=BindingContext.DeleteItemCommand, Source={x:Reference Name=cvInventoryCount}}"
+                                                    NumberOfTapsRequired="1"
+                                                    CommandParameter="{Binding .}">
+                                                </TapGestureRecognizer>
+                                            </StackLayout.GestureRecognizers-->
+                                        </StackLayout>
+                                    </StackLayout>
+                                </Frame>
+                                <BoxView Color="Black" HeightRequest="1" Margin="0"></BoxView>
+                            </StackLayout>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </StackLayout>
+            <StackLayout
+                Margin="20,0,20,30"
+                VerticalOptions="EndAndExpand"
+                Orientation="Horizontal">
+                <Button
+                    Text="Exportar"
+                    HorizontalOptions="FillAndExpand"
+                    Command="{Binding ExportInventoryCommand}">
+                </Button>
+                <Button
+                    Text="Limpiar"
+                    HorizontalOptions="FillAndExpand"
+                    Command="{Binding DeleteInventoryCommand}">
+                </Button>
+            </StackLayout>
+        </StackLayout>
+
+    </ContentPage.Content>
+    
+</ContentPage>

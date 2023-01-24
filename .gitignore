@@ -1,0 +1,9 @@
+﻿InventoryCount.App/InventoryCount.App/bin
+InventoryCount.App/InventoryCount.App.Android/bin
+InventoryCount.App/InventoryCount.App/obj
+InventoryCount.App/InventoryCount.App.Android/obj
+InventoryCount.App/InventoryCount.App.iOS/bin/iPhone/Debug
+InventoryCount.App/InventoryCount.App.iOS/bin/iPhoneSimulator/Release
+InventoryCount.App/InventoryCount.App.iOS/obj/iPhone/Debug
+InventoryCount.App/InventoryCount.App.iOS/obj
+InventoryCount.App/InventoryCount.App.Android/InventoryCount.App.Android.csproj.user

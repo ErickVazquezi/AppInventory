@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="InventoryCount.App.Pages.AddItemCount"
+             Title="{Binding CurrentItem.Code}">
+    
+    <ContentPage.Content>
+        <StackLayout 
+            Margin="20,50,20,0">
+            <Label
+                Text="Ingresa la cantidad del artículo"
+                HorizontalOptions="CenterAndExpand">
+            </Label>
+            <Entry 
+                x:Name="entCount"
+                Margin="0,10,0,0"
+                HorizontalOptions="FillAndExpand"
+                Keyboard="Numeric"
+                Text="{Binding SelectedItemCount}"
+                HorizontalTextAlignment="Center"
+                FontSize="Title"
+                Placeholder="0"/>
+            <Button
+                Margin="0,10,0,0"
+                Text="Guardar"
+                HorizontalOptions="FillAndExpand"
+                Command="{Binding SaveItemCountCommand}"
+                CommandParameter="{Binding CurrentItemCount}"/>
+            <StackLayout
+                Orientation="Horizontal"
+                IsVisible="{Binding IsExistingItem}"
+                HorizontalOptions="CenterAndExpand">
+                <Label
+                    Text="Cantidad capturada: ">
+                </Label>
+                <Label
+                    Text="{Binding CurrentItem.Count}">
+                </Label>
+            </StackLayout>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>
