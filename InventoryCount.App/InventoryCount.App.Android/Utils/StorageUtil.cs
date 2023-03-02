@@ -8,9 +8,7 @@ namespace InventoryCount.App.Droid.Utils
     {
         public string GetDownloadsPath()
         {
-            //return Path.Combine(Environment.ExternalStorageDirectory.AbsolutePath, Environment.DirectoryDownloads);
-            //return (string)Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDownloads);
-            return (string)Android.OS.Environment.GetExternalStoragePublicDirectory("/Inventario");
+            return Path.Combine(Environment.ExternalStorageDirectory.AbsolutePath, Environment.DirectoryDownloads);
         }
     }
 }

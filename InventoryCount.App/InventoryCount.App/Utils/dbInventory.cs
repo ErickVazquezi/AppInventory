@@ -2,9 +2,7 @@
 using SQLite;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace InventoryCount.App.Utils
@@ -29,12 +27,6 @@ namespace InventoryCount.App.Utils
         {
             return Database.Table<InventoryItem>().ToListAsync();
         }
-
-        //public Task<List<InventoryItem>> GetItemsNotDoneAsync()
-        //{
-        //    // SQL queries are also possible
-        //    return Database.QueryAsync<InventoryItem>("SELECT * FROM [InventoryItem] WHERE [Done] = 0");
-        //}
 
         public Task<InventoryItem> GetItemAsync(string code)
         {

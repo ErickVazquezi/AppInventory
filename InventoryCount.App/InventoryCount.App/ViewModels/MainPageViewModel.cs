@@ -1,9 +1,5 @@
 ﻿using Plugin.Permissions;
 using Plugin.Permissions.Abstractions;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using Xamarin.Forms;
 
@@ -14,7 +10,7 @@ namespace InventoryCount.App.ViewModels
         private string _area { get; set; }
         public MainPageViewModel() 
         {
-            //Task.Run(async () => await AskForPermission());
+
         }
 
         public string Area
@@ -46,7 +42,7 @@ namespace InventoryCount.App.ViewModels
                             }
                             else
                             {
-                                await Application.Current.MainPage.DisplayAlert("Permiso Necesario", "Permiso necesario para importar productos", "Ok");
+                                await Application.Current.MainPage.DisplayAlert("Atencion", "Permiso necesario para importar productos", "Ok");
                             }
                         }
                         else

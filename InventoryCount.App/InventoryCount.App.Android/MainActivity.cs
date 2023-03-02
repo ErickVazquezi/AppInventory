@@ -1,6 +1,4 @@
-﻿using System;
-
-using Android.App;
+﻿using Android.App;
 using Android.Content.PM;
 using Android.Runtime;
 using Android.OS;
@@ -9,16 +7,10 @@ using InventoryCount.App.Utils;
 using InventoryCount.App.Droid.Utils;
 using Plugin.CurrentActivity;
 using Plugin.Permissions;
-using Java.Interop;
-using Android;
-using AndroidX.Core.App;
-using Android.Nfc;
-using Android.Util;
-using Google.Android.Material.Snackbar;
 
 namespace InventoryCount.App.Droid
 {
-    [Activity(Label = "Inventario Central", Icon = "@mipmap/main_icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize )]
+    [Activity(Label = "Inventario", Icon = "@mipmap/main_icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize )]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
         protected override void OnCreate(Bundle savedInstanceState)

@@ -1,23 +1,14 @@
-﻿using CsvHelper;
-using CsvHelper.Configuration;
-using InventoryCount.App.Models;
+﻿using InventoryCount.App.Models;
 using InventoryCount.App.Pages;
 using InventoryCount.App.Utils;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Xamarin.Forms;
-using ZXing;
 using ZXing.Net.Mobile.Forms;
-using ZXing.OneD;
 
 namespace InventoryCount.App.ViewModels
 {
@@ -34,6 +25,7 @@ namespace InventoryCount.App.ViewModels
         private int _area;
         private string _capturedCode = string.Empty;
         private bool _isExistingItem = false;
+
         public ItemCountViewModel(int area)
         {
             _area = area;
@@ -42,6 +34,8 @@ namespace InventoryCount.App.ViewModels
             Task.Run(async () => { await LoadInventoryItems(); });
             LoadStoreItems();
         }
+
+        #region Properties
 
         public string PageTitle
         {
@@ -136,6 +130,10 @@ namespace InventoryCount.App.ViewModels
             }
         }
 
+        #endregion Properties
+
+        #region ItemCount
+
         public ICommand ScanCommand 
         { 
             get 
@@ -151,9 +149,7 @@ namespace InventoryCount.App.ViewModels
 
                     scanPage.OnScanResult += (result) => 
                     {
-                        // Stop scanning
                         scanPage.IsScanning = false;
-                        // Pop the page and show the result
                         Device.BeginInvokeOnMainThread(async () => 
                         {
                             await Application.Current.MainPage.Navigation.PopAsync();
@@ -172,35 +168,20 @@ namespace InventoryCount.App.ViewModels
                             }
                         });
                     };
-
-                    // Navigate to our scanner page
                     await Application.Current.MainPage.Navigation.PushAsync(scanPage);
                 });
             }
         }
 
-        public void ValidateTypedCode()
+        public ICommand GoSearchPageCommand
         {
-            // Pop the page and show the result
-            Device.BeginInvokeOnMainThread(async () =>
+            get
             {
-                CurrentItem = StoreItems.FirstOrDefault(i => i.Code == CapturedCode);
-                if (CurrentItem != null)
+                return new Command(async () =>
                 {
-                    if (CurrentItem.Id != 0 && InventoryCount.Any(i => i.Id == CurrentItem.Id))
-                    {
-                        IsExistingItem = true;
-                        await Application.Current.MainPage.DisplayAlert("", "Producto ya capturado. Puedes editar la cantidad capturada", "Aceptar");
-                    }
-
-                    await Application.Current.MainPage.Navigation.PushAsync(new AddItemCount(this));
-                }
-                else
-                {
-                    await Application.Current.MainPage.DisplayAlert(string.Empty, "Código no encontrado o escaneo incorrecto. Intenta buscarlo manualmente.", "Aceptar");
                     await Application.Current.MainPage.Navigation.PushAsync(new SearchItem(this));
-                }
-            });
+                });
+            }
         }
 
         public ICommand EditCountCommand
@@ -215,16 +196,76 @@ namespace InventoryCount.App.ViewModels
             }
         }
 
-        public ICommand GoSearchPageCommand
+        public ICommand DeleteItemCommand
+        {
+            get
+            {
+                return new Command(async (e) =>
+                {
+                    CurrentItem = (InventoryItem)e;
+                    bool userConfirmation = await Application.Current.MainPage.DisplayAlert("", "¿Deseas eliminar este artículo?", "Aceptar", "Cancelar");
+                    if (userConfirmation)
+                    {
+                        int affectedRows = await _dbContext.DeleteItemAsync(CurrentItem);
+                        if (affectedRows <= 0)
+                            await Application.Current.MainPage.DisplayAlert("", "Ocurrió un error al intentar eliminar el registro", "Aceptar");
+                        else
+                            await LoadInventoryItems();
+                    }
+                });
+            }
+        }
+
+        public ICommand DeleteInventoryCommand
         {
             get
             {
                 return new Command(async () =>
-                {                   
-                    await Application.Current.MainPage.Navigation.PushAsync(new SearchItem(this));
+                {
+                    var deleteDialog = await Application.Current.MainPage.DisplayAlert("", "¿Estas seguro de eliminar los registros de esta área?", "Aceptar", "Cancelar");
+                    if (deleteDialog)
+                    {
+                        foreach (var item in InventoryCount)
+                            await _dbContext.DeleteItemAsync(item);
+
+                        TotalInventory = 0;
+                        TotalItemsCount = 0;
+                        InventoryCount.Clear();
+                    }
                 });
             }
         }
+
+        public ICommand ExportInventoryCommand
+        {
+            get
+            {
+                return new Command(async () =>
+                {
+                    try
+                    {
+                        string filename = $"{_area}_{DateTime.Now.Date.ToString("dd_MM_yyyy")}.txt";
+                        string fullPath = Path.Combine(DependencyService.Get<IStorageUtil>().GetDownloadsPath(), filename);
+                        string contentToExport = string.Empty;
+
+                        foreach (var item in InventoryCount)
+                        {
+                            contentToExport += $"{item.Area},{item.Code},{item.Count}\r\n";
+                        }
+                        File.WriteAllText(fullPath, contentToExport);
+                        await Application.Current.MainPage.DisplayAlert("", "Archivo exportado", "Aceptar");
+                    }
+                    catch (Exception ex)
+                    {
+                        await Application.Current.MainPage.DisplayAlert("Error", ex.ToString(), "Aceptar");
+                    }
+                });
+            }
+        }
+
+        #endregion ItemCount
+
+        #region SearchItem
 
         public ICommand SelectedItemCommand
         {
@@ -238,13 +279,17 @@ namespace InventoryCount.App.ViewModels
                         IsExistingItem = true;
                         await Application.Current.MainPage.DisplayAlert("", "Producto ya capturado. Puedes editar la cantidad capturada", "Aceptar");
                     }
-                    
+
                     await Application.Current.MainPage.Navigation.PushAsync(new AddItemCount(this));
                 });
             }
         }
 
-        public Command SaveItemCountCommand
+        #endregion SearchItem
+
+        #region AddItemCount
+
+        public ICommand SaveItemCountCommand
         {
             get
             {
@@ -299,86 +344,7 @@ namespace InventoryCount.App.ViewModels
             }
         }
 
-        public ICommand SearchCommand
-        {
-            get
-            {
-                return new Command(async () =>
-                {
-                    if (StoreItems.Count <= 1)
-                        LoadStoreItems();
-
-                    await Application.Current.MainPage.Navigation.PushAsync(new SearchItem(this));
-                });
-            }
-        }
-
-        public ICommand DeleteInventoryCommand
-        {
-            get
-            {
-                return new Command(async () =>
-                {
-                    var deleteDialog = await Application.Current.MainPage.DisplayAlert("", "¿Estas seguro de eliminar los registros de esta área?", "Aceptar", "Cancelar");
-                    if (deleteDialog)
-                    {
-                        foreach (var item in InventoryCount)
-                            await _dbContext.DeleteItemAsync(item);
-
-                        TotalInventory = 0;
-                        TotalItemsCount = 0;
-                        InventoryCount.Clear();
-                    }
-                });
-            }
-        }
-
-        public ICommand DeleteItemCommand
-        {
-            get
-            {
-                return new Command(async (e) =>
-                {
-                    CurrentItem = (InventoryItem)e;
-                    bool userConfirmation = await Application.Current.MainPage.DisplayAlert("", "¿Deseas eliminar este artículo?", "Aceptar", "Cancelar");
-                    if (userConfirmation)
-                    {
-                        int affectedRows = await _dbContext.DeleteItemAsync(CurrentItem);
-                        if (affectedRows <= 0)
-                            await Application.Current.MainPage.DisplayAlert("", "Ocurrió un error al intentar eliminar el registro", "Aceptar");
-                        else
-                            await LoadInventoryItems();                       
-                    }
-                });
-            }
-        }
-
-        public ICommand ExportInventoryCommand
-        {
-            get
-            {
-                return new Command(async () =>
-                {
-                    try
-                    {
-                        string filename = $"{_area}_{DateTime.Now.Date.ToString("dd_MM_yyyy")}.txt";
-                        string fullPath = Path.Combine(DependencyService.Get<IStorageUtil>().GetDownloadsPath(), filename);
-                        string contentToExport = string.Empty;
-
-                        foreach (var item in InventoryCount)
-                        {
-                            contentToExport += $"{item.Area},{item.Code},{item.Count}\r\n";
-                        }
-                        File.WriteAllText(fullPath, contentToExport);
-                        await Application.Current.MainPage.DisplayAlert("", "Archivo exportado", "Aceptar");
-                    }
-                    catch (Exception ex)
-                    {
-                        await Application.Current.MainPage.DisplayAlert("Error", ex.ToString(), "Aceptar");
-                    }
-                });
-            }
-        }
+        #endregion AddItemCount       
 
         public void LoadStoreItems()
         {
@@ -413,7 +379,7 @@ namespace InventoryCount.App.ViewModels
             TotalItemsCount = 0;
             TotalInventory = 0;
             var savedItems = await _dbContext.GetItemsAsync();
-            savedItems = savedItems.Where(i => i.Area == _area).ToList();
+            savedItems = savedItems.Where(i => i.Area == _area).OrderByDescending(x => x.Id).ToList();
             foreach (var item in savedItems)
             {
                 InventoryCount.Add(new InventoryItem
@@ -428,6 +394,29 @@ namespace InventoryCount.App.ViewModels
             }
 
             TotalItemsCount = InventoryCount.Count;
+        }
+
+        public void ValidateTypedCode()
+        {
+            Device.BeginInvokeOnMainThread(async () =>
+            {
+                CurrentItem = StoreItems.FirstOrDefault(i => i.Code == CapturedCode);
+                if (CurrentItem != null)
+                {
+                    if (CurrentItem.Id != 0 && InventoryCount.Any(i => i.Id == CurrentItem.Id))
+                    {
+                        IsExistingItem = true;
+                        await Application.Current.MainPage.DisplayAlert("", "Producto ya capturado. Puedes editar la cantidad capturada", "Aceptar");
+                    }
+
+                    await Application.Current.MainPage.Navigation.PushAsync(new AddItemCount(this));
+                }
+                else
+                {
+                    await Application.Current.MainPage.DisplayAlert(string.Empty, "Código no encontrado o escaneo incorrecto. Intenta buscarlo manualmente.", "Aceptar");
+                    await Application.Current.MainPage.Navigation.PushAsync(new SearchItem(this));
+                }
+            });
         }
     }
 }
